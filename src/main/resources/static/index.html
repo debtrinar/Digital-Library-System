@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lumina - Online Library & Universal PDF Reader</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#22c55e',
+              600: '#16a34a',
+              700: '#15803d',
+            },
+            amber: {
+              400: '#fbbf24',
+              500: '#f59e0b',
+            },
+            night: {
+              900: '#0b0f19',
+              800: '#111827',
+              700: '#1f2937',
+              600: '#374151'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            serif: ['Merriweather', 'Georgia', 'serif'],
+          }
+        }
+      }
+    }
+  </script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&display=swap" rel="stylesheet">
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="bg-night-900 text-slate-100 min-h-screen flex flex-col font-sans selection:bg-emerald-500 selection:text-white">
+
+  <!-- Navbar -->
+  <header class="sticky top-0 z-40 backdrop-blur-md bg-night-900/80 border-b border-slate-800/80 transition-all">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-18 flex items-center justify-between gap-4">
+      
+      <!-- Brand Logo -->
+      <a href="/" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+          <i data-lucide="book-open" class="w-5 h-5 text-night-900 stroke-[2.5]"></i>
+        </div>
+        <div>
+          <span class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-400 group-hover:from-emerald-400 group-hover:to-teal-300 transition-colors">
+            Lumina
+          </span>
+          <span class="text-xs uppercase tracking-wider text-emerald-400 font-semibold block -mt-1">Library & PDF Reader</span>
+        </div>
+      </a>
+
+      <!-- Quick Search Bar in Header -->
+      <div class="flex-1 max-w-xl mx-4 hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+          <input 
+            type="text" 
+            id="navSearchInput"
+            placeholder="Search millions of books, authors, subjects... (Press '/' to focus)" 
+            class="w-full bg-slate-800/60 border border-slate-700/80 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all"
+          >
+          <button id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white">
+            <i data-lucide="x" class="w-4 h-4"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Navigation & Actions -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <button id="tabExplore" class="nav-tab active flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors hover:text-emerald-400">
+          <i data-lucide="compass" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Explore</span>
+        </button>
+        <button id="tabShelf" class="nav-tab flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium text-slate-400 hover:text-emerald-400 transition-colors relative">
+          <i data-lucide="bookmark" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">My Shelf</span>
+          <span id="shelfBadge" class="hidden absolute -top-1 -right-1 bg-emerald-500 text-night-900 text-[10px] font-bold rounded-full w-4 h-4 flex items-center justify-center">0</span>
+        </button>
+        <button id="btnOpenUpload" class="flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20 transition-all">
+          <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+          <span class="hidden md:inline">Upload PDF</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
+
+    <!-- Hero Section (Visible in Explore View) -->
+    <section id="heroSection" class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-900 via-night-800 to-night-900 border border-slate-800 p-8 sm:p-12 shadow-2xl">
+      <div class="absolute -right-20 -top-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute right-40 -bottom-20 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="relative z-10 max-w-3xl space-y-5">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          Worldwide Online Library & Java PDF Core
+        </div>
+        
+        <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
+          Find any book. Read instantly in <span class="bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400">PDF format</span>.
+        </h1>
+        
+        <p class="text-slate-300 text-base sm:text-lg leading-relaxed max-w-2xl">
+          Search millions of titles across literature, science, technology, and philosophy. 
+          Enjoy in-browser PDF reading, auto-generated smart dossiers, bookmarking, and local PDF uploads.
+        </p>
+
+        <!-- Big Search Form -->
+        <form id="heroSearchForm" class="flex flex-col sm:flex-row gap-3 pt-2">
+          <div class="relative flex-1">
+            <i data-lucide="search" class="w-5 h-5 text-slate-400 absolute left-4 top-1/2 -translate-y-1/2"></i>
+            <input 
+              type="text" 
+              id="heroSearchInput" 
+              placeholder="e.g. Clean Code, Isaac Asimov, Psychology, Sherlock Holmes..."
+              class="w-full bg-slate-950/80 border border-slate-700/80 rounded-2xl pl-12 pr-4 py-3.5 text-base text-white placeholder-slate-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 shadow-inner"
+            >
+          </div>
+          <button type="submit" class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 font-semibold text-night-900 shadow-lg shadow-emerald-500/25 transition-all active:scale-95">
+            <i data-lucide="search" class="w-5 h-5"></i>
+            <span>Search Library</span>
+          </button>
+        </form>
+
+        <!-- Category Pills -->
+        <div class="flex items-center gap-2 pt-2 flex-wrap text-xs">
+          <span class="text-slate-400 font-medium mr-1">Popular Topics:</span>
+          <button class="cat-pill active" data-cat="all">All Books</button>
+          <button class="cat-pill" data-cat="fiction">Fiction & Classics</button>
+          <button class="cat-pill" data-cat="computers">Computer Science</button>
+          <button class="cat-pill" data-cat="philosophy">Philosophy</button>
+          <button class="cat-pill" data-cat="science">Science</button>
+          <button class="cat-pill" data-cat="history">History</button>
+          <button class="cat-pill" data-cat="psychology">Psychology</button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- EXPLORE VIEW -->
+    <section id="exploreView" class="space-y-8">
+      
+      <!-- Section Header -->
+      <div class="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <h2 id="sectionTitle" class="text-2xl font-bold text-white flex items-center gap-2.5">
+            <i data-lucide="flame" class="w-6 h-6 text-amber-400"></i>
+            <span>Featured Masterpieces & Classics</span>
+          </h2>
+          <p id="sectionSubtitle" class="text-slate-400 text-sm mt-1">
+            Carefully curated books with instant full-text PDF reading and verified editions.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="text-xs text-slate-400">
+            Showing <span id="resultsCount" class="font-semibold text-white">6</span> books
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading Skeleton -->
+      <div id="loadingGrid" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- 4 Skeleton cards -->
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+        <div class="skeleton-card"></div>
+      </div>
+
+      <!-- Books Grid -->
+      <div id="booksGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Dynamic Book Cards will be rendered here -->
+      </div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="hidden py-16 text-center space-y-4">
+        <div class="w-16 h-16 rounded-full bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+          <i data-lucide="book-x" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-lg font-semibold text-white">No books found</h3>
+        <p class="text-slate-400 text-sm max-w-sm mx-auto">
+          We couldn't find matches for your search. Try adjusting your query or check spelling.
+        </p>
+        <button id="btnResetSearch" class="px-4 py-2 bg-emerald-500/10 text-emerald-400 rounded-xl text-sm font-medium hover:bg-emerald-500/20">
+          Reset Search
+        </button>
+      </div>
+
+    </section>
+
+    <!-- MY SHELF VIEW -->
+    <section id="shelfView" class="hidden space-y-8">
+      <div class="flex items-center justify-between flex-wrap gap-4 border-b border-slate-800 pb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-white flex items-center gap-2.5">
+            <i data-lucide="bookmark" class="w-6 h-6 text-emerald-400"></i>
+            <span>My Personal Library & Reading Shelf</span>
+          </h2>
+          <p class="text-slate-400 text-sm mt-1">
+            Your saved books, uploaded PDFs, bookmarks, and reading progress stored locally.
+          </p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button id="btnShelfUpload" class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 text-night-900 font-semibold rounded-xl text-sm shadow hover:bg-emerald-400 transition-colors">
+            <i data-lucide="plus" class="w-4 h-4"></i>
+            <span>Add PDF Document</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Shelf Books Grid -->
+      <div id="shelfGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Shelf cards inserted via JS -->
+      </div>
+
+      <!-- Empty Shelf Notice -->
+      <div id="emptyShelfState" class="hidden py-20 text-center space-y-4 border border-dashed border-slate-800 rounded-3xl p-8">
+        <div class="w-16 h-16 rounded-full bg-slate-800/80 text-emerald-400 flex items-center justify-center mx-auto">
+          <i data-lucide="library" class="w-8 h-8"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white">Your shelf is currently empty</h3>
+        <p class="text-slate-400 text-sm max-w-md mx-auto">
+          Bookmark books from the Explore tab or upload any PDF from your computer to read with bookmarks and full notes.
+        </p>
+        <div class="flex justify-center gap-3 pt-2">
+          <button id="btnShelfExplore" class="px-5 py-2.5 bg-emerald-500 text-night-900 rounded-xl text-sm font-semibold hover:bg-emerald-400">
+            Explore Books
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- BOOK DETAILS MODAL -->
+  <div id="bookModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-night-800 border border-slate-700 rounded-3xl max-w-3xl w-full p-6 sm:p-8 relative shadow-2xl space-y-6 my-8 animate-fadeIn">
+      
+      <!-- Close Button -->
+      <button id="closeModalBtn" class="absolute top-5 right-5 w-9 h-9 rounded-full bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <div class="flex flex-col sm:flex-row gap-6">
+        <!-- Cover Art -->
+        <div class="w-full sm:w-48 flex-shrink-0 flex flex-col items-center">
+          <div class="w-40 sm:w-48 h-60 sm:h-68 rounded-2xl overflow-hidden shadow-2xl border border-slate-700 bg-slate-900 relative">
+            <img id="modalCover" src="" alt="Book Cover" class="w-full h-full object-cover">
+          </div>
+          <div id="modalRating" class="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-400/10 text-amber-400 text-xs font-semibold">
+            <i data-lucide="star" class="w-3.5 h-3.5 fill-amber-400"></i>
+            <span id="modalRatingText">4.8 / 5.0</span>
+          </div>
+        </div>
+
+        <!-- Meta Details -->
+        <div class="flex-1 space-y-3">
+          <div class="flex items-center gap-2 flex-wrap" id="modalCategories">
+            <!-- Badges -->
+          </div>
+          <h2 id="modalTitle" class="text-2xl sm:text-3xl font-extrabold text-white leading-tight"></h2>
+          <p id="modalAuthor" class="text-emerald-400 font-medium text-base"></p>
+          
+          <div class="grid grid-cols-2 gap-3 py-2 text-xs text-slate-300 border-y border-slate-700/80 my-3">
+            <div><span class="text-slate-400">Publisher:</span> <strong id="modalPublisher" class="text-white block truncate"></strong></div>
+            <div><span class="text-slate-400">Published:</span> <strong id="modalDate" class="text-white block"></strong></div>
+            <div><span class="text-slate-400">Pages:</span> <strong id="modalPages" class="text-white block"></strong></div>
+            <div><span class="text-slate-400">Format:</span> <strong class="text-emerald-400 block font-semibold">PDF Ready</strong></div>
+          </div>
+
+          <!-- Description -->
+          <div class="space-y-1">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Synopsis & Overview</h4>
+            <div id="modalDescription" class="text-slate-300 text-sm leading-relaxed max-h-48 overflow-y-auto pr-2 custom-scrollbar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-4 border-t border-slate-700/80">
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <button id="modalAddToShelfBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl border border-slate-700 hover:border-slate-500 bg-slate-800/80 text-white text-sm font-semibold transition-all">
+            <i data-lucide="bookmark" class="w-4 h-4"></i>
+            <span id="modalShelfText">Save to Shelf</span>
+          </button>
+          <button id="modalDownloadDossierBtn" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl border border-slate-700 hover:border-slate-500 bg-slate-800/80 text-slate-300 hover:text-white text-sm font-semibold transition-all" title="Download Java-generated PDF Dossier">
+            <i data-lucide="file-text" class="w-4 h-4"></i>
+            <span>PDF Dossier</span>
+          </button>
+        </div>
+
+        <button id="modalReadPdfBtn" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-night-900 text-sm font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95">
+          <i data-lucide="book-open" class="w-4 h-4"></i>
+          <span>Read in PDF Reader</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- UPLOAD PDF MODAL -->
+  <div id="uploadModal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm hidden items-center justify-center p-4">
+    <div class="bg-night-800 border border-slate-700 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl space-y-5 animate-fadeIn">
+      <button id="closeUploadModalBtn" class="absolute top-5 right-5 w-8 h-8 rounded-full bg-slate-700/50 hover:bg-slate-700 text-slate-300 hover:text-white flex items-center justify-center">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+          <i data-lucide="upload" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white">Upload PDF to Library</h3>
+          <p class="text-slate-400 text-xs">Read your local PDF documents anytime with page bookmarks</p>
+        </div>
+      </div>
+
+      <form id="uploadForm" class="space-y-4">
+        <!-- File input drop area -->
+        <label for="pdfFileInput" class="border-2 border-dashed border-slate-700 hover:border-emerald-500/50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer bg-slate-900/50 hover:bg-slate-900 transition-colors">
+          <i data-lucide="file-up" class="w-10 h-10 text-slate-400 mb-2"></i>
+          <span id="uploadFileName" class="text-sm font-medium text-slate-200">Click to choose PDF or drag & drop</span>
+          <span class="text-xs text-slate-400 mt-1">Accepts standard .pdf files</span>
+          <input type="file" id="pdfFileInput" accept="application/pdf" class="hidden" required>
+        </label>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Book / Document Title</label>
+          <input type="text" id="uploadTitle" placeholder="e.g. Machine Learning Specialization" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Author / Source</label>
+          <input type="text" id="uploadAuthor" placeholder="e.g. Andrew Ng" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-emerald-500">
+        </div>
+
+        <button type="submit" id="btnSubmitUpload" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 font-bold text-night-900 rounded-xl text-sm transition-all shadow-lg shadow-emerald-500/20">
+          Upload & Add to My Shelf
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATIONS CONTAINER -->
+  <div id="toastContainer" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-800/80 bg-night-900/60 py-6">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+      <div class="flex items-center gap-2">
+        <span>&copy; 2026 Lumina Digital Online Library. Engineered in Java SE.</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="inline-flex items-center gap-1.5 text-emerald-400">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          Java Server Connected (Port 8080)
+        </span>
+        <a href="/reader.html" class="hover:text-emerald-400 transition-colors">Dedicated PDF Reader</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/js/app.js"></script>
+</body>
+</html>

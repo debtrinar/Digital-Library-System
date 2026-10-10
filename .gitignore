@@ -1,0 +1,18 @@
+# Operating System & IDE
+.DS_Store
+Thumbs.db
+*.iml
+.idea/
+.vscode/
+
+# Build artifacts & binaries
+bin/
+target/
+*.class
+
+# Embedded JDK runtime (Do not push 200MB binaries to GitHub)
+.jdk/
+
+# User uploads & temporary data
+data/uploads/*
+!data/uploads/.gitkeep
