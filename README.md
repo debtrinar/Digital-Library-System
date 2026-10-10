@@ -4,6 +4,20 @@
 
 ---
 
+## 🎓 Institutional Protocol for Educational Institutes & Colleges
+
+**Lumina serves as a turnkey, self-hosted digital library protocol designed specifically for educational institutes, universities, schools, and research academies.** 
+
+Instead of relying on fragmented file shares or costly third-party subscriptions, academic institutions can deploy this protocol on local campus servers or private clouds to provide an all-in-one digital learning hub:
+
+- **🏛️ Personalized Campus Libraries**: Universities and academic departments can curate and host customized subject libraries, departmental textbooks, course readers, research papers, syllabus documents, and historical archives.
+- **👨‍🎓 Universal Student Access**: Students across campus can easily connect over the local network (`http://library-server:8080`), instantly search millions of global literature titles alongside their school's syllabus materials, and read directly in the built-in PDF viewer.
+- **📝 Academic Annotation & Study Logs**: Students can maintain dedicated reading logs, page progress tracking, and margin notes for each subject or research topic without losing their spot.
+- **📑 Instant PDF Dossier Generation**: Students and faculty can generate structured executive reading dossiers and discussion questions in seconds using the pure-Java PDF synthesis engine.
+- **🔒 Privacy, Zero-Cost & Zero Tracking**: Built with zero external commercial advertising, no user-tracking data collection, and 100% self-hosted on lightweight Java standard runtime.
+
+---
+
 ## 🌟 Key Features
 
 ### 1. 🔍 Worldwide Instant Book Discovery
